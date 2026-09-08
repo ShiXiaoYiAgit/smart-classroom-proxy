@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>智慧教室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --md-sys-color-primary: #6750A4;
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-primary-container: #EADDFF;
+  --md-sys-color-on-primary-container: #21005D;
+  --md-sys-color-secondary: #625B71;
+  --md-sys-color-on-secondary: #FFFFFF;
+  --md-sys-color-secondary-container: #E8DEF8;
+  --md-sys-color-on-secondary-container: #1D192B;
+  --md-sys-color-tertiary: #7D5260;
+  --md-sys-color-surface: #FFFBFE;
+  --md-sys-color-surface-variant: #E7E0EC;
+  --md-sys-color-on-surface: #1C1B1F;
+  --md-sys-color-on-surface-variant: #49454F;
+  --md-sys-color-outline: #79747E;
+  --md-sys-color-outline-variant: #CAC4D0;
+  --md-sys-color-error: #B3261E;
+  --md-sys-color-error-container: #F9DEDC;
+  --md-sys-color-on-error-container: #410E0B;
+  --md-sys-color-warning: #F9A825;
+  --md-sys-color-success: #2E7D32;
+  --md-sys-elevation-1: 0px 1px 2px rgba(0,0,0,0.3), 0px 1px 3px 1px rgba(0,0,0,0.15);
+  --md-sys-elevation-2: 0px 1px 2px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15);
+  --md-sys-elevation-3: 0px 1px 3px rgba(0,0,0,0.3), 0px 4px 8px 3px rgba(0,0,0,0.15);
+  --radius: 16px;
+  --md-sys-motion-duration-short: 200ms;
+  --md-sys-motion-duration-medium: 300ms;
+  --md-sys-motion-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --top-bar-bg: rgba(103, 80, 164, 0.08);
+}
+
+:root[data-theme="dark"] {
+  --md-sys-color-primary: #D0BCFF;
+  --md-sys-color-on-primary: #381E72;
+  --md-sys-color-primary-container: #4F378B;
+  --md-sys-color-on-primary-container: #EADDFF;
+  --md-sys-color-secondary: #CCC2DC;
+  --md-sys-color-on-secondary: #332D41;
+  --md-sys-color-secondary-container: #4A4458;
+  --md-sys-color-on-secondary-container: #E8DEF8;
+  --md-sys-color-tertiary: #EFB8C8;
+  --md-sys-color-surface: #1C1B1F;
+  --md-sys-color-surface-variant: #49454F;
+  --md-sys-color-on-surface: #E6E1E5;
+  --md-sys-color-on-surface-variant: #CAC4D0;
+  --md-sys-color-outline: #938F99;
+  --md-sys-color-outline-variant: #49454F;
+  --md-sys-color-error: #F2B8B5;
+  --md-sys-color-error-container: #8C1D18;
+  --md-sys-color-on-error-container: #F9DEDC;
+  --md-sys-color-warning: #FFD54F;
+  --md-sys-color-success: #81C784;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
+html { font-size: 18px; }
+
+.ripple {
+  position: relative;
+  overflow: hidden;
+  transform: translate3d(0, 0, 0);
+}
+.ripple-wave {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(55,55,55,0.58) 0%, rgba(55,55,55,0.26) 32%, rgba(55,55,55,0.07) 62%, transparent 88%);
+  pointer-events: none;
+  transform: scale(0.1);
+  opacity: 0.12;
+}
+.ripple-wave.expanding {
+  animation: ripple-expand 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes ripple-expand {
+  0% { transform: scale(0.1); opacity: 0.12; }
+  100% { transform: scale(4); opacity: 0.55; }
+}
+
+:root[data-theme="dark"] .ripple-wave {
+  background: radial-gradient(circle, rgba(210,210,210,0.54) 0%, rgba(210,210,210,0.24) 32%, rgba(210,210,210,0.06) 62%, transparent 88%);
+}
+
+body {
+  font-family: 'Roboto', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Top Bar ===== */
+.top-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 72px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--top-bar-bg);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: var(--md-sys-elevation-1);
+}
+.top-bar__title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--md-sys-color-primary);
+  letter-spacing: 0.01em;
+}
+.top-bar__settings {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  touch-action: manipulation;
+}
+.top-bar__settings:active { transform: translateY(-50%) scale(0.9); }
+.top-bar__settings svg { width: 22px; height: 22px; }
+
+.layout {
+  display: flex;
+  height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 96px 96px 32px;
+  gap: 80px;
+}
+.left-panel {
+  flex: 0 0 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+    height: auto;
+    padding: 92px 16px 20px;
+    gap: 24px;
+  }
+  .left-panel { flex: none; width: 100%; }
+  .right-panel { flex: none; width: 100%; height: auto; }
+  .top-bar__settings { right: 12px; width: 40px; height: 40px; }
+}
+
+.panel-header, .history-header {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.history-header {
+  justify-content: space-between;
+  gap: 16px;
+}
+.section-label, .history-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--md-sys-color-primary);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.cards-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+}
+
+.data-card {
+  background: var(--md-sys-color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--md-sys-elevation-1);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  padding: 20px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  flex: 1;
+  min-height: 0;
+}
+
+.data-card__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.data-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.data-card__icon--light {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.data-card__icon--mic {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.data-card__icon svg { width: 24px; height: 24px; }
+.data-card__label {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.data-card__value {
+  font-size: 3rem;
+  font-weight: 400;
+  color: var(--md-sys-color-on-surface);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.data-card__unit {
+  font-size: 0.9375rem;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.data-card__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.data-card__status--ok {
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--md-sys-color-success);
+}
+.data-card__status--warn {
+  background: rgba(249, 168, 37, 0.15);
+  color: var(--md-sys-color-warning);
+}
+.data-card__status--error {
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+}
+.data-card__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.time-bar {
+  background: var(--md-sys-color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--md-sys-elevation-1);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.time-bar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.time-bar__label {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface);
+  white-space: nowrap;
+}
+.time-bar__refresh {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--md-sys-color-outline);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+.time-bar__refresh:active { transform: scale(0.9); }
+.time-bar__refresh svg { width: 18px; height: 18px; }
+.time-bar__refresh.spin svg { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.time-bar__bottom {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.9375rem;
+  color: var(--md-sys-color-on-surface-variant);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.time-bar__abs {
+  color: var(--md-sys-color-on-surface);
+}
+.time-bar__rel {
+  color: var(--md-sys-color-primary);
+  font-weight: 500;
+}
+
+.toggle-switch {
+  display: flex;
+  background: var(--md-sys-color-surface-variant);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--radius);
+  padding: 3px;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.toggle-switch__btn {
+  padding: 10px 26px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  font-family: inherit;
+  touch-action: manipulation;
+}
+.toggle-switch__btn.active {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: var(--md-sys-elevation-1);
+}
+
+.history-content {
+  flex: 1;
+  background: var(--md-sys-color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--md-sys-elevation-1);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ===== History Toolbar (shared) ===== */
+.history-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  flex-shrink: 0;
+}
+.history-toolbar__btn {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 0.9375rem;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.history-toolbar__count {
+  margin-left: auto;
+  font-size: 0.875rem;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.history-toolbar__count span {
+  color: var(--md-sys-color-primary);
+  font-weight: 700;
+}
+
+/* ===== List View ===== */
+.list-view {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+.list-view.active { display: flex; }
+
+.list-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  gap: 20px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+}
+.list-row:last-child { border-bottom: none; }
+.list-row__time {
+  width: 120px;
+  font-size: 0.9375rem;
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: 'Roboto Mono', monospace;
+  flex-shrink: 0;
+}
+.list-row__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.list-row__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.list-row__icon--light {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.list-row__icon--mic {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.list-row__icon svg { width: 16px; height: 16px; }
+.list-row__val {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface);
+  font-variant-numeric: tabular-nums;
+}
+.list-row__unit {
+  font-size: 0.8125rem;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* ===== Glass Modal ===== */
+.glass-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s cubic-bezier(0.2, 0.0, 0.0, 1.0), visibility 0s 0.25s;
+  backdrop-filter: blur(8px) saturate(1.6);
+  -webkit-backdrop-filter: blur(8px) saturate(1.6);
+}
+.glass-modal.active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.25s cubic-bezier(0.2, 0.0, 0.0, 1.0), visibility 0s 0s;
+}
+.glass-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.32);
+}
+.glass-modal__sheet {
+  position: relative;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255,255,255,0.45);
+  border-radius: 32px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.85) translateY(40px);
+  transition: transform 0.35s cubic-bezier(0.05, 0.7, 0.1, 1.0);
+}
+:root[data-theme="dark"] .glass-modal__sheet {
+  background: rgba(30, 27, 36, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.glass-modal.active .glass-modal__sheet {
+  transform: scale(1) translateY(0);
+}
+.glass-modal__header {
+  padding: 32px 32px 20px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--md-sys-color-primary);
+  text-align: center;
+  flex-shrink: 0;
+}
+.glass-modal__list {
+  overflow-y: auto;
+  padding: 12px 24px 24px;
+  flex: 1;
+}
+.glass-modal__item {
+  width: 100%;
+  padding: 18px 22px;
+  border-radius: 14px;
+  border: none;
+  background: transparent;
+  font-size: 1.0625rem;
+  font-family: 'Roboto Mono', monospace;
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.glass-modal__item.active {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  font-weight: 700;
+}
+.glass-modal__item .count {
+  font-size: 0.9375rem;
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: 'Roboto', sans-serif;
+}
+.glass-modal__item.active .count {
+  color: var(--md-sys-color-on-primary-container);
+  opacity: 0.8;
+}
+.glass-modal__footer {
+  padding: 16px 24px 24px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+.glass-modal__cancel {
+  padding: 14px 56px;
+  border-radius: 14px;
+  border: none;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== Theme Color Picker ===== */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  padding: 8px 12px 20px;
+}
+.theme-swatch {
+  aspect-ratio: 1;
+  border-radius: 18px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s var(--md-sys-motion-easing-standard), border-color 0.2s;
+  position: relative;
+  filter: saturate(0.7) brightness(1.05);
+}
+.theme-swatch.active {
+  border-color: var(--md-sys-color-on-surface);
+  transform: scale(1.1);
+}
+.theme-swatch::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.25rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.theme-swatch.active::after { opacity: 1; }
+
+.theme-custom {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  margin: 0 12px 12px;
+  border-radius: 18px;
+  background: var(--md-sys-color-surface-variant);
+}
+.theme-custom__label {
+  flex: 1;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface);
+}
+.theme-custom__input {
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: none;
+  padding: 3px;
+}
+.theme-custom__input::-webkit-color-swatch-wrapper { padding: 0; }
+.theme-custom__input::-webkit-color-swatch { border: none; border-radius: 11px; }
+
+/* Dark Mode Toggle */
+.dark-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  margin: 0 12px 12px;
+  border-radius: 18px;
+  background: var(--md-sys-color-surface-variant);
+}
+.dark-toggle__label {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface);
+}
+.dark-toggle__switch {
+  position: relative;
+  width: 52px;
+  height: 32px;
+  border-radius: 16px;
+  background: var(--md-sys-color-outline-variant);
+  cursor: pointer;
+  transition: background 0.2s;
+  border: none;
+  padding: 0;
+}
+.dark-toggle__switch.active {
+  background: var(--md-sys-color-primary);
+}
+.dark-toggle__knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--md-sys-color-surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  transition: transform 0.2s var(--md-sys-motion-easing-standard);
+}
+.dark-toggle__switch.active .dark-toggle__knob {
+  transform: translateX(20px);
+}
+
+/* ===== Chart View ===== */
+.chart-view {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.chart-view.active { display: flex; }
+
+.chart-merged__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px 10px;
+  flex-shrink: 0;
+}
+.chart-merged__legend {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.chart-merged__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.chart-merged__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.chart-merged__dot--light { background: var(--md-sys-color-primary); }
+.chart-merged__dot--mic { background: var(--md-sys-color-secondary); }
+
+.chart-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+.chart-side-labels {
+  width: 70px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px 0;
+  border-right: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
+}
+.chart-side-label {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.3;
+}
+.chart-side-label small {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.chart-scroll-wrapper {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+.chart-svg {
+  height: 100%;
+  display: block;
+}
+
+@media (pointer: coarse) {
+  .time-bar__refresh { width: 44px; height: 44px; }
+  .toggle-switch__btn { padding: 12px 28px; }
+}
+</style>
+</head>
+<body>
+<header class="top-bar">
+  <h1 class="top-bar__title">智慧教室</h1>
+  <button class="top-bar__settings ripple" id="btnSettings" aria-label="设置">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </button>
+</header>
+
+<div class="layout">
+  <div class="left-panel">
+    <div class="panel-header"><div class="section-label">当前数据</div></div>
+    <div class="cards-column">
+      <div class="data-card ripple" id="cardLight">
+        <div class="data-card__header">
+          <div class="data-card__icon data-card__icon--light">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+          </div>
+          <span class="data-card__label">光线强度</span>
+        </div>
+        <div>
+          <span class="data-card__value" id="valLight">--</span>
+          <span class="data-card__unit">lux</span>
+        </div>
+        <div class="data-card__status data-card__status--ok" id="statusLight">
+          <span class="data-card__status-dot"></span>等待数据
+        </div>
+      </div>
+      <div class="data-card ripple" id="cardMic">
+        <div class="data-card__header">
+          <div class="data-card__icon data-card__icon--mic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+          </div>
+          <span class="data-card__label">环境音量</span>
+        </div>
+        <div>
+          <span class="data-card__value" id="valMic">--</span>
+          <span class="data-card__unit">dB</span>
+        </div>
+        <div class="data-card__status data-card__status--ok" id="statusMic">
+          <span class="data-card__status-dot"></span>等待数据
+        </div>
+      </div>
+    </div>
+    <div class="time-bar">
+      <div class="time-bar__top">
+        <span class="time-bar__label">获取数据的时间</span>
+        <button class="time-bar__refresh ripple" id="btnRefresh" aria-label="刷新数据">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="time-bar__bottom">
+        <span class="time-bar__abs" id="updateTimeAbs">等待数据...</span>
+        <span class="time-bar__rel" id="updateTimeRel"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="history-header">
+      <div class="history-title">历史数据</div>
+      <div class="toggle-switch">
+        <button class="toggle-switch__btn ripple active" data-view="list">列表</button>
+        <button class="toggle-switch__btn ripple" data-view="chart">趋势</button>
+      </div>
+    </div>
+    <div class="history-content">
+      <!-- Shared Toolbar -->
+      <div class="history-toolbar">
+        <button class="history-toolbar__btn ripple" id="sharedDatePickerBtn">
+          <span id="sharedDatePickerText">--</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </button>
+        <span class="history-toolbar__count">共 <span id="sharedDayCount">0</span> 条</span>
+      </div>
+      <!-- List View -->
+      <div class="list-view active" id="viewList">
+        <div class="list-body" id="listBody">
+          <div style="padding:40px;text-align:center;color:var(--md-sys-color-on-surface-variant)">正在连接服务器...</div>
+        </div>
+      </div>
+      <!-- Chart View -->
+      <div class="chart-view" id="viewChart">
+        <div class="chart-merged__header">
+          <div class="chart-merged__legend">
+            <div class="chart-merged__legend-item"><span class="chart-merged__dot chart-merged__dot--light"></span>光线 (lux)</div>
+            <div class="chart-merged__legend-item"><span class="chart-merged__dot chart-merged__dot--mic"></span>音量 (dB)</div>
+          </div>
+        </div>
+        <div class="chart-main">
+          <div class="chart-side-labels">
+            <div class="chart-side-label" style="color:var(--md-sys-color-primary)">光线<br><small>0-<span id="labelMaxL">4095</span></small></div>
+            <div class="chart-side-label" style="color:var(--md-sys-color-secondary)">音量<br><small>0-<span id="labelMaxM">3000</span></small></div>
+          </div>
+          <div class="chart-scroll-wrapper" id="chartScroll">
+            <svg class="chart-svg" id="svgMerged"></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Date Picker Modal -->
+<div class="glass-modal" id="dateModal">
+  <div class="glass-modal__backdrop" id="dateModalBackdrop"></div>
+  <div class="glass-modal__sheet">
+    <div class="glass-modal__header">选择日期</div>
+    <div class="glass-modal__list" id="dateModalList"></div>
+    <div class="glass-modal__footer">
+      <button class="glass-modal__cancel ripple" id="dateModalCancel">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="glass-modal" id="settingsModal">
+  <div class="glass-modal__backdrop" id="settingsModalBackdrop"></div>
+  <div class="glass-modal__sheet">
+    <div class="glass-modal__header">设置</div>
+    <div class="glass-modal__list" id="settingsModalList">
+      <div class="theme-grid" id="themeGrid">
+        <div class="theme-swatch active" data-theme="purple" style="background:#8B7DB3" title="紫色"></div>
+        <div class="theme-swatch" data-theme="blue" style="background:#6B8FA8" title="蓝色"></div>
+        <div class="theme-swatch" data-theme="green" style="background:#7BA882" title="绿色"></div>
+        <div class="theme-swatch" data-theme="orange" style="background:#C9906B" title="橙色"></div>
+        <div class="theme-swatch" data-theme="pink" style="background:#B87D96" title="粉色"></div>
+      </div>
+      <div class="theme-custom">
+        <span class="theme-custom__label">自定义颜色</span>
+        <input type="color" class="theme-custom__input" id="customColorInput" value="#6750A4">
+      </div>
+      <div class="dark-toggle">
+        <span class="dark-toggle__label">深色模式</span>
+        <button class="dark-toggle__switch" id="darkModeSwitch" aria-label="切换深色模式">
+          <span class="dark-toggle__knob"></span>
+        </button>
+      </div>
+    </div>
+    <div class="glass-modal__footer">
+      <button class="glass-modal__cancel ripple" id="settingsModalCancel">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  /* ===== Disable right-click & text selection ===== */
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  
+  /* ===== Ripple (click/long-press both fade out) ===== */
+  function initRipple() {
+    document.querySelectorAll('.ripple').forEach(el => {
+      if (el._rippleInit) return;
+      el._rippleInit = true;
+      function removeWave(wave) { if (wave && wave.parentNode) wave.remove(); }
+      function fadeOut(wave) {
+        if (wave._fading) return;
+        wave._fading = true;
+        wave.style.transition = 'opacity 0.4s ease-out';
+        void wave.offsetHeight; // 强制重绘确保transition生效
+        wave.style.opacity = '0';
+        setTimeout(() => removeWave(wave), 400);
+      }
+      function createRipple(e) {
+        const old = el.querySelector('.ripple-wave');
+        if (old) { old.removeEventListener('animationend', old._onEnd); fadeOut(old); }
+        const rect = el.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height) * 2.6;
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        const wave = document.createElement('span');
+        wave.className = 'ripple-wave expanding';
+        wave.style.width = size + 'px';
+        wave.style.height = size + 'px';
+        wave.style.left = x + 'px';
+        wave.style.top = y + 'px';
+        el.appendChild(wave);
+        let released = false;
+        function onAnimationEnd() {
+          wave.removeEventListener('animationend', onAnimationEnd);
+          wave.style.transform = 'scale(4)';
+          wave.style.opacity = '0.55';
+          wave.classList.remove('expanding');
+          if (released) fadeOut(wave);
+        }
+        wave._onEnd = onAnimationEnd;
+        wave.addEventListener('animationend', onAnimationEnd);
+        function onUp() {
+          released = true;
+          el.removeEventListener('pointerup', onUp);
+          el.removeEventListener('pointerleave', onUp);
+          el.removeEventListener('pointercancel', onUp);
+          if (!wave.classList.contains('expanding')) fadeOut(wave);
+        }
+        el.addEventListener('pointerup', onUp);
+        el.addEventListener('pointerleave', onUp);
+        el.addEventListener('pointercancel', onUp);
+      }
+      el.addEventListener('pointerdown', createRipple);
+    });
+  }
+  initRipple();
+
+  /* ===== Theme System ===== */
+  const themes = {
+    purple: {
+      light: { primary: '#6750A4', onPrimary: '#FFFFFF', primaryContainer: '#EADDFF', onPrimaryContainer: '#21005D' },
+      dark:  { primary: '#D0BCFF', onPrimary: '#381E72', primaryContainer: '#4F378B', onPrimaryContainer: '#EADDFF' }
+    },
+    blue: {
+      light: { primary: '#1B5E91', onPrimary: '#FFFFFF', primaryContainer: '#D1E4FF', onPrimaryContainer: '#001D36' },
+      dark:  { primary: '#9FCAFF', onPrimary: '#003258', primaryContainer: '#00497D', onPrimaryContainer: '#D1E4FF' }
+    },
+    green: {
+      light: { primary: '#2E7D32', onPrimary: '#FFFFFF', primaryContainer: '#C8E6C9', onPrimaryContainer: '#002105' },
+      dark:  { primary: '#A5D6A7', onPrimary: '#00390F', primaryContainer: '#1B5E20', onPrimaryContainer: '#C8E6C9' }
+    },
+    orange: {
+      light: { primary: '#E65100', onPrimary: '#FFFFFF', primaryContainer: '#FFDBCC', onPrimaryContainer: '#351000' },
+      dark:  { primary: '#FFB690', onPrimary: '#571F00', primaryContainer: '#7B2F00', onPrimaryContainer: '#FFDBCC' }
+    },
+    pink: {
+      light: { primary: '#C2185B', onPrimary: '#FFFFFF', primaryContainer: '#F8BBD9', onPrimaryContainer: '#3E001E' },
+      dark:  { primary: '#F48FB1', onPrimary: '#5D1137', primaryContainer: '#880E4F', onPrimaryContainer: '#F8BBD9' }
+    }
+  };
+
+  function hexToRgb(hex) {
+    const clean = hex.replace('#', '').slice(0, 6);
+    const n = parseInt(clean, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(x => Math.round(Math.max(0, Math.min(255, x))).toString(16).padStart(2, '0')).join('');
+  }
+  function mixColor(hex, ratio, mixWith) {
+    const [r, g, b] = hexToRgb(hex);
+    return rgbToHex(r + (mixWith[0] - r) * ratio, g + (mixWith[1] - g) * ratio, b + (mixWith[2] - b) * ratio);
+  }
+  function darken(hex, ratio) { return mixColor(hex, 1 - ratio, [0, 0, 0]); }
+  function lighten(hex, ratio) { return mixColor(hex, ratio, [255, 255, 255]); }
+  function getLuminance(hex) {
+    const [r, g, b] = hexToRgb(hex);
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  }
+
+  function getCustomColors(hex, isDark) {
+    const container = isDark ? darken(hex, 0.5) : lighten(hex, 0.72);
+    const onContainer = isDark ? lighten(hex, 0.45) : darken(hex, 0.38);
+    const onPrimary = getLuminance(hex) > 0.5 ? '#1C1B1F' : '#FFFFFF';
+    return {
+      light: { primary: hex, onPrimary: onPrimary, primaryContainer: container, onPrimaryContainer: onContainer },
+      dark:  { primary: hex, onPrimary: isDark ? (getLuminance(hex) > 0.5 ? '#1C1B1F' : '#E6E1E5') : onPrimary, primaryContainer: container, onPrimaryContainer: onContainer }
+    };
+  }
+
+  let forceDark = null;
+  function isDarkMode() {
+    if (forceDark !== null) return forceDark;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function applyTheme(themeKey, customHex) {
+    const isDark = isDarkMode();
+    const colors = themeKey === 'custom' && customHex ? getCustomColors(customHex, isDark) : themes[themeKey];
+    if (!colors) return;
+    const c = isDark ? colors.dark : colors.light;
+    const r = document.documentElement;
+    const darkPrimary = darken(c.primary, 0.22);
+    const lightPrimary = lighten(c.primary, 0.55);
+    const onSecondary = getLuminance(darkPrimary) > 0.5 ? '#1C1B1F' : '#FFFFFF';
+    r.style.setProperty('--md-sys-color-primary', c.primary);
+    r.style.setProperty('--md-sys-color-on-primary', c.onPrimary);
+    r.style.setProperty('--md-sys-color-primary-container', c.primaryContainer);
+    r.style.setProperty('--md-sys-color-on-primary-container', c.onPrimaryContainer);
+    r.style.setProperty('--md-sys-color-secondary', darkPrimary);
+    r.style.setProperty('--md-sys-color-on-secondary', onSecondary);
+    r.style.setProperty('--md-sys-color-secondary-container', lightPrimary);
+    r.style.setProperty('--md-sys-color-on-secondary-container', darkPrimary);
+    const [pr, pg, pb] = hexToRgb(c.primary);
+    r.style.setProperty('--top-bar-bg', `rgba(${pr}, ${pg}, ${pb}, 0.08)`);
+    localStorage.setItem('smart-classroom-theme', JSON.stringify({ key: themeKey, custom: customHex || null, forceDark: forceDark }));
+  }
+
+  function initTheme() {
+    const saved = localStorage.getItem('smart-classroom-theme');
+    let key = 'purple', hex = null, savedForce = null;
+    if (saved) try { const p = JSON.parse(saved); key = p.key; hex = p.custom; savedForce = p.forceDark; } catch(e) {}
+    if (savedForce !== null) forceDark = savedForce;
+    else forceDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', forceDark ? 'dark' : 'light');
+    applyTheme(key, hex);
+    document.querySelectorAll('.theme-swatch').forEach(s => s.classList.toggle('active', s.dataset.theme === key));
+    if (hex) document.getElementById('customColorInput').value = hex;
+    const darkSwitch = document.getElementById('darkModeSwitch');
+    if (forceDark === true) darkSwitch.classList.add('active');
+    else darkSwitch.classList.remove('active');
+  }
+
+  document.getElementById('themeGrid').addEventListener('click', e => {
+    const swatch = e.target.closest('.theme-swatch');
+    if (!swatch) return;
+    document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
+    swatch.classList.add('active');
+    applyTheme(swatch.dataset.theme, null);
+  });
+
+  document.getElementById('customColorInput').addEventListener('input', e => {
+    document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
+    applyTheme('custom', e.target.value);
+  });
+
+  document.getElementById('darkModeSwitch').addEventListener('click', function() {
+    const isActive = this.classList.toggle('active');
+    forceDark = isActive;
+    document.documentElement.setAttribute('data-theme', forceDark ? 'dark' : 'light');
+    const saved = localStorage.getItem('smart-classroom-theme');
+    let key = 'purple', hex = null;
+    if (saved) try { const p = JSON.parse(saved); key = p.key; hex = p.custom; } catch(e) {}
+    applyTheme(key, hex);
+  });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (forceDark !== null) return;
+    const isDark = e.matches;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    const saved = localStorage.getItem('smart-classroom-theme');
+    let key = 'purple', hex = null;
+    if (saved) try { const p = JSON.parse(saved); key = p.key; hex = p.custom; } catch(e) {}
+    applyTheme(key, hex);
+  });
+
+  initTheme();
+
+  let historyData = [];
+  let currentView = 'list';
+  let latestTime = null;
+  let isLoading = false;
+  let selectedDate = '';
+
+  function pad(n) { return n < 10 ? '0' + n : n; }
+  function fmtTime(d) {
+    if (!d || isNaN(d.getTime())) return '--';
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' +
+      pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+  function fmtListTime(d) {
+    if (!d || isNaN(d.getTime())) return '--';
+    return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+  function fmtDate(d) {
+    if (!d || isNaN(d.getTime())) return '';
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+  function fmtChartTime(d) {
+    if (!d || isNaN(d.getTime())) return '';
+    return pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function fmtRel(d) {
+    if (!d || isNaN(d.getTime())) return '';
+    const sec = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (sec < 0) return '未来';
+    if (sec < 5) return '刚刚';
+    if (sec < 60) return sec + '秒前';
+    if (sec < 3600) return Math.floor(sec / 60) + '分钟前';
+    if (sec < 86400) return Math.floor(sec / 3600) + '小时前';
+    return Math.floor(sec / 86400) + '天前';
+  }
+
+  function getLightStatus(v) {
+    if (v === null || v === undefined || isNaN(v)) return { text: '等待数据', cls: 'data-card__status--ok' };
+    if (v < 200) return { text: '光线过暗', cls: 'data-card__status--error' };
+    if (v > 800) return { text: '光线过强', cls: 'data-card__status--warn' };
+    return { text: '光线适宜', cls: 'data-card__status--ok' };
+  }
+  function getMicStatus(v) {
+    if (v === null || v === undefined || isNaN(v)) return { text: '等待数据', cls: 'data-card__status--ok' };
+    if (v > 65) return { text: '音量偏高', cls: 'data-card__status--warn' };
+    return { text: '音量正常', cls: 'data-card__status--ok' };
+  }
+
+  function updateCards() {
+    if (!historyData.length) {
+      document.getElementById('valLight').textContent = '--';
+      document.getElementById('valMic').textContent = '--';
+      document.getElementById('statusLight').className = 'data-card__status data-card__status--ok';
+      document.getElementById('statusLight').innerHTML = '<span class="data-card__status-dot"></span>等待数据';
+      document.getElementById('statusMic').className = 'data-card__status data-card__status--ok';
+      document.getElementById('statusMic').innerHTML = '<span class="data-card__status-dot"></span>等待数据';
+      document.getElementById('updateTimeAbs').textContent = '等待数据...';
+      document.getElementById('updateTimeRel').textContent = '';
+      return;
+    }
+    const latest = historyData[historyData.length - 1];
+    latestTime = latest.time;
+    document.getElementById('valLight').textContent = latest.light;
+    document.getElementById('valMic').textContent = latest.mic;
+    const ls = getLightStatus(latest.light);
+    const sl = document.getElementById('statusLight');
+    sl.className = 'data-card__status ' + ls.cls;
+    sl.innerHTML = '<span class="data-card__status-dot"></span>' + ls.text;
+    const ms = getMicStatus(latest.mic);
+    const sm = document.getElementById('statusMic');
+    sm.className = 'data-card__status ' + ms.cls;
+    sm.innerHTML = '<span class="data-card__status-dot"></span>' + ms.text;
+    updateTimeDisplay();
+  }
+
+  function updateTimeDisplay() {
+    if (!latestTime) return;
+    document.getElementById('updateTimeAbs').textContent = fmtTime(latestTime);
+    document.getElementById('updateTimeRel').textContent = '· ' + fmtRel(latestTime);
+  }
+  setInterval(updateTimeDisplay, 1000);
+
+  function getAvailableDates() {
+    const map = new Map();
+    historyData.forEach(d => { const key = fmtDate(d.time); map.set(key, (map.get(key) || 0) + 1); });
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }
+
+  /* ===== Modal Helpers ===== */
+  function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+    document.body.style.overflow = 'hidden';
+    initRipple();
+  }
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  /* ===== Date Modal ===== */
+  function openDateModal() {
+    const list = document.getElementById('dateModalList');
+    const dates = getAvailableDates();
+    if (!dates.length) {
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--md-sys-color-on-surface-variant)">暂无数据</div>';
+    } else {
+      let html = '';
+      dates.forEach(([date, count]) => {
+        const isActive = date === selectedDate;
+        html += `<button class="glass-modal__item ripple${isActive ? ' active' : ''}" data-date="${date}"><span>${date}</span><span class="count">${count} 条</span></button>`;
+      });
+      list.innerHTML = html;
+      list.querySelectorAll('.glass-modal__item').forEach(btn => {
+        btn.addEventListener('click', function() {
+          selectedDate = this.dataset.date;
+          const display = selectedDate.replace(/-/g, '/');
+          document.getElementById('sharedDatePickerText').textContent = display;
+          renderList();
+          if (currentView === 'chart') drawChart();
+          closeModal('dateModal');
+        });
+      });
+    }
+    openModal('dateModal');
+  }
+
+  document.getElementById('sharedDatePickerBtn').addEventListener('click', openDateModal);
+  document.getElementById('dateModalCancel').addEventListener('click', () => closeModal('dateModal'));
+  document.getElementById('dateModalBackdrop').addEventListener('click', () => closeModal('dateModal'));
+
+  /* ===== Settings Modal ===== */
+  document.getElementById('btnSettings').addEventListener('click', () => openModal('settingsModal'));
+  document.getElementById('settingsModalCancel').addEventListener('click', () => closeModal('settingsModal'));
+  document.getElementById('settingsModalBackdrop').addEventListener('click', () => closeModal('settingsModal'));
+
+  function renderList() {
+    const listBody = document.getElementById('listBody');
+    if (!historyData.length) {
+      listBody.innerHTML = '<div style="padding:40px;text-align:center;color:var(--md-sys-color-on-surface-variant)">暂无数据</div>';
+      document.getElementById('sharedDayCount').textContent = '0';
+      document.getElementById('sharedDatePickerText').textContent = '--';
+      return;
+    }
+    const dates = getAvailableDates();
+    if (!selectedDate && dates.length) selectedDate = dates[dates.length - 1][0];
+    const display = selectedDate ? selectedDate.replace(/-/g, '/') : '--';
+    document.getElementById('sharedDatePickerText').textContent = display;
+    const filtered = historyData.filter(d => fmtDate(d.time) === selectedDate);
+    const recent = [...filtered].reverse();
+    document.getElementById('sharedDayCount').textContent = recent.length;
+    if (!recent.length) {
+      listBody.innerHTML = '<div style="padding:40px;text-align:center;color:var(--md-sys-color-on-surface-variant)">该日期暂无数据</div>';
+      return;
+    }
+    let html = '';
+    recent.forEach(d => {
+      html += `
+      <div class="list-row ripple">
+        <div class="list-row__time">${fmtListTime(d.time)}</div>
+        <div class="list-row__item">
+          <div class="list-row__icon list-row__icon--light">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+          </div>
+          <span class="list-row__val">${d.light}</span>
+          <span class="list-row__unit">lux</span>
+        </div>
+        <div class="list-row__item">
+          <div class="list-row__icon list-row__icon--mic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+          </div>
+          <span class="list-row__val">${d.mic}</span>
+          <span class="list-row__unit">dB</span>
+        </div>
+      </div>`;
+    });
+    listBody.innerHTML = html;
+    initRipple();
+  }
+
+  /* ===== Chart: 上下分区，固定侧栏标题，数据夸张 ===== */
+  function drawChart() {
+    const svg = document.getElementById('svgMerged');
+    const wrapper = document.getElementById('chartScroll');
+    let chartData = historyData;
+    if (selectedDate) {
+      chartData = historyData.filter(d => fmtDate(d.time) === selectedDate);
+    } else {
+      const dates = getAvailableDates();
+      if (dates.length) {
+        selectedDate = dates[dates.length - 1][0];
+        chartData = historyData.filter(d => fmtDate(d.time) === selectedDate);
+      }
+    }
+    if (chartData.length < 2) {
+      svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="var(--md-sys-color-on-surface-variant)" font-size="16">数据不足</text>';
+      svg.setAttribute('viewBox', '0 0 400 320');
+      svg.style.width = '100%';
+      return;
+    }
+    
+    const POINT_W = 120;
+    const W = Math.max(wrapper.clientWidth, chartData.length * POINT_W);
+    const MARGIN_LEFT = 28;
+    const MARGIN_RIGHT = 28;
+    const PLOT_H = 260;
+    const GAP = 50;
+    const TOP_Y = 30;
+    const BOT_Y = TOP_Y + PLOT_H + GAP;
+    const PAD_BOTTOM = 50;
+    const H = BOT_Y + PLOT_H + PAD_BOTTOM;
+    
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.style.width = W + 'px';
+    svg.style.height = '100%';
+    svg.style.minWidth = '100%';
+    
+    const valsL = chartData.map(d => d.light);
+    const valsM = chartData.map(d => d.mic);
+    
+    // 数据夸张：最大值小于500时降低Y轴上限
+    let maxL = Math.max(...valsL, 1);
+    let maxM = Math.max(...valsM, 1);
+    let yMaxL = maxL < 500 ? Math.max(300, maxL * 1.5) : 4095;
+    let yMaxM = maxM < 500 ? Math.max(300, maxM * 1.5) : 3000;
+    
+    document.getElementById('labelMaxL').textContent = Math.round(yMaxL);
+    document.getElementById('labelMaxM').textContent = Math.round(yMaxM);
+    
+    const x = i => MARGIN_LEFT + (W - MARGIN_LEFT - MARGIN_RIGHT) * i / (chartData.length - 1);
+    const yLight = v => TOP_Y + PLOT_H * (1 - Math.min(v, yMaxL) / yMaxL);
+    const yMic   = v => BOT_Y + PLOT_H * (1 - Math.min(v, yMaxM) / yMaxM);
+    
+    function makePath(vals, yFn) {
+      let d = 'M' + x(0) + ',' + yFn(vals[0]);
+      for (let i = 0; i < vals.length - 1; i++) {
+        const x0 = x(i), y0 = yFn(vals[i]);
+        const x1 = x(i + 1), y1 = yFn(vals[i + 1]);
+        const cp1x = x0 + (x1 - x0) * 0.5, cp1y = y0;
+        const cp2x = x1 - (x1 - x0) * 0.5, cp2y = y1;
+        d += ' C' + cp1x + ',' + cp1y + ' ' + cp2x + ',' + cp2y + ' ' + x1 + ',' + y1;
+      }
+      return d;
+    }
+    
+    const pathL = makePath(valsL, yLight);
+    const pathM = makePath(valsM, yMic);
+    const areaL = pathL + ` L${x(valsL.length-1)},${TOP_Y+PLOT_H} L${x(0)},${TOP_Y+PLOT_H} Z`;
+    const areaM = pathM + ` L${x(valsM.length-1)},${BOT_Y+PLOT_H} L${x(0)},${BOT_Y+PLOT_H} Z`;
+    
+    let grid = '';
+    let xLabels = '';
+    
+    // 水平网格线
+    [0, 0.25, 0.5, 0.75, 1].forEach(p => {
+      const y1 = TOP_Y + PLOT_H * (1 - p);
+      const y2 = BOT_Y + PLOT_H * (1 - p);
+      grid += `<line x1="${MARGIN_LEFT}" y1="${y1}" x2="${W-MARGIN_RIGHT}" y2="${y1}" stroke="var(--md-sys-color-outline-variant)" stroke-width="0.5" opacity="0.3"/>`;
+      grid += `<line x1="${MARGIN_LEFT}" y1="${y2}" x2="${W-MARGIN_RIGHT}" y2="${y2}" stroke="var(--md-sys-color-outline-variant)" stroke-width="0.5" opacity="0.3"/>`;
+    });
+    
+    // 垂直网格线与X轴标签
+    for (let i = 0; i < chartData.length; i++) {
+      const xi = x(i);
+      grid += `<line x1="${xi}" y1="${TOP_Y}" x2="${xi}" y2="${TOP_Y+PLOT_H}" stroke="var(--md-sys-color-outline-variant)" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.2"/>`;
+      grid += `<line x1="${xi}" y1="${BOT_Y}" x2="${xi}" y2="${BOT_Y+PLOT_H}" stroke="var(--md-sys-color-outline-variant)" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.2"/>`;
+      xLabels += `<text x="${xi}" y="${H-16}" text-anchor="middle" font-size="15" fill="var(--md-sys-color-on-surface-variant)" font-family="Roboto Mono, monospace">${fmtChartTime(chartData[i].time)}</text>`;
+    }
+    
+    let dotsL = '', dotsM = '', valLabels = '';
+    for (let i = 0; i < chartData.length; i++) {
+      const xi = x(i);
+      const yiL = yLight(valsL[i]);
+      const yiM = yMic(valsM[i]);
+      dotsL += `<circle cx="${xi}" cy="${yiL}" r="5" fill="var(--md-sys-color-primary)" stroke="var(--md-sys-color-surface)" stroke-width="2"/>`;
+      dotsM += `<circle cx="${xi}" cy="${yiM}" r="5" fill="var(--md-sys-color-secondary)" stroke="var(--md-sys-color-surface)" stroke-width="2"/>`;
+      valLabels += `<text x="${xi}" y="${yiL-12}" text-anchor="middle" font-size="14" font-weight="700" fill="var(--md-sys-color-primary)" font-family="Roboto Mono, monospace">${Math.round(valsL[i])}</text>`;
+      valLabels += `<text x="${xi}" y="${yiM-12}" text-anchor="middle" font-size="14" font-weight="700" fill="var(--md-sys-color-secondary)" font-family="Roboto Mono, monospace">${Math.round(valsM[i])}</text>`;
+    }
+    
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="gradL" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--md-sys-color-primary)" stop-opacity="0.22"/><stop offset="100%" stop-color="var(--md-sys-color-primary)" stop-opacity="0"/></linearGradient>
+        <linearGradient id="gradM" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--md-sys-color-secondary)" stop-opacity="0.22"/><stop offset="100%" stop-color="var(--md-sys-color-secondary)" stop-opacity="0"/></linearGradient>
+      </defs>
+      ${grid}
+      <path d="${areaL}" fill="url(#gradL)"/>
+      <path d="${pathL}" fill="none" stroke="var(--md-sys-color-primary)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="${areaM}" fill="url(#gradM)"/>
+      <path d="${pathM}" fill="none" stroke="var(--md-sys-color-secondary)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      ${valLabels}${dotsL}${dotsM}${xLabels}
+    `;
+    setTimeout(() => { wrapper.scrollLeft = wrapper.scrollWidth; }, 10);
+  }
+
+  function switchView(view) {
+    currentView = view;
+    document.querySelectorAll('.toggle-switch__btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+    document.getElementById('viewList').classList.toggle('active', view === 'list');
+    document.getElementById('viewChart').classList.toggle('active', view === 'chart');
+    if (view === 'chart') requestAnimationFrame(() => drawChart());
+  }
+  document.querySelectorAll('.toggle-switch__btn').forEach(btn => {
+    btn.addEventListener('click', () => switchView(btn.dataset.view));
+  });
+
+  async function refreshAll() {
+    if (isLoading) return;
+    isLoading = true;
+    const btn = document.getElementById('btnRefresh');
+    btn.classList.add('spin');
+    try {
+      const resp = await fetch('/api/paired');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      if (data.success && data.history) {
+        historyData = data.history.map(d => ({
+          time: new Date(d.time.replace(' ', 'T')),
+          light: Math.round(d.light),
+          mic: Math.round(d.mic)
+        })).reverse();
+        updateCards();
+        renderList();
+        if (currentView === 'chart') drawChart();
+      } else {
+        console.warn('数据格式异常:', data);
+      }
+    } catch (e) {
+      console.error('获取数据失败:', e);
+    } finally {
+      btn.classList.remove('spin');
+      isLoading = false;
+    }
+  }
+  document.getElementById('btnRefresh').addEventListener('click', refreshAll);
+
+  updateCards();
+  renderList();
+  refreshAll();
+  setInterval(refreshAll, 10000);
+})();
+</script>
+</body>
+</html>
